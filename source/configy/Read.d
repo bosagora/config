@@ -287,18 +287,48 @@ public struct CLIArgs
 
 public Nullable!T parseConfigFileSimple (T) (string path, StrictMode strict = StrictMode.Error)
 {
-    return parseConfigFileSimple!(T)(CLIArgs(path), strict);
+    return wrapException(parseConfigFile!(T)(CLIArgs(path), strict));
 }
 
-
 /// Ditto
-public Nullable!T parseConfigFileSimple (T) (in CLIArgs args, StrictMode strict = StrictMode.Error)
+Nullable!T parseConfigFileSimple (T) (in CLIArgs args, StrictMode strict = StrictMode.Error)
+{
+    return wrapException(parseConfigFile!(args, strict));
+}
+
+/*******************************************************************************
+
+    Wrap and print exceptions to stderr
+
+    This allows to call either `parseConfigFile` or `parseConfigString`
+    and pretty-print the exception:
+    ```
+    int main ()
+    {
+        auto configN = wrapException(
+            parseConfigString!Config("config.yaml", "/dev/null")
+        );
+        if (configN.isNull()) return 1; // Error path
+        auto config = configN.get();
+        // Rest of the program ...
+    }
+    ```
+
+    Params:
+        parseCall = A call to one of the `parse*` functions, such as
+                    `parseConfigString` or `parseConfigFile`, or anything
+                    that would call them.
+
+    Returns:
+        An initialized `T` instance if reading/parsing was successful;
+        a `null` instance otherwise.
+
+*******************************************************************************/
+
+public Nullable!T wrapException (T) (lazy T parseCall)
 {
     try
-    {
-        Node root = Loader.fromFile(args.config_path).load();
-        return nullable(parseConfig!T(args, root, strict));
-    }
+        return nullable(parseCall);
     catch (ConfigException exc)
     {
         exc.printException();
