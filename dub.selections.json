@@ -1,0 +1,7 @@
+{
+	"fileVersion": 1,
+	"versions": {
+		"dyaml": "0.10.0",
+		"tinyendian": "0.2.0"
+	}
+}
