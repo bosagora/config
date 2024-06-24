@@ -21,9 +21,6 @@ __dummy.html
 docs/
 *-test-library
 *-test-unittest
-# Since this is a library, we ignore `dub.selections.json`.
-# It only matters when used with an application.
-dub.selections.json
 
 # Code coverage
 *.lst
