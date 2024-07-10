@@ -244,7 +244,7 @@ public struct CLIArgs
 
             "override|O",
                 "Override a config file value\n" ~
-                "Example: -O foo.bar=true -o dns=1.1.1.1 -o dns=2.2.2.2\n" ~
+                "Example: -O foo.bar=true -O dns=1.1.1.1 -O dns=2.2.2.2\n" ~
                 "Array values are additive, other items are set to the last override",
                 &this.overridesHandler,
         );
