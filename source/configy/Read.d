@@ -707,19 +707,19 @@ package FR.Type parseField (alias FR)
             true);
 
     else static if (hasConverter!(FR.Ref))
-        return wrapException(node.viaConverter!(FR), path, node.startMark());
+        return wrapConstruct(node.viaConverter!(FR), path, node.startMark());
 
     else static if (hasFromYAML!(FR.Type))
     {
         scope impl = new ConfigParserImpl!(FR.Type)(node, path, ctx);
-        return wrapException(FR.Type.fromYAML(impl), path, node.startMark());
+        return wrapConstruct(FR.Type.fromYAML(impl), path, node.startMark());
     }
 
     else static if (hasFromString!(FR.Type))
-        return wrapException(FR.Type.fromString(node.as!string), path, node.startMark());
+        return wrapConstruct(FR.Type.fromString(node.as!string), path, node.startMark());
 
     else static if (hasStringCtor!(FR.Type))
-        return wrapException(FR.Type(node.as!string), path, node.startMark());
+        return wrapConstruct(FR.Type(node.as!string), path, node.startMark());
 
     else static if (is(immutable(FR.Type) == immutable(core.time.Duration)))
     {
@@ -861,7 +861,7 @@ private T parseScalar (T) (Node node, string path)
 
 *******************************************************************************/
 
-private T wrapException (T) (lazy T exp, string path, Mark position,
+private T wrapConstruct (T) (lazy T exp, string path, Mark position,
     string file = __FILE__, size_t line = __LINE__)
 {
     try
