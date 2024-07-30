@@ -174,7 +174,7 @@ unittest
     }
     catch (ConfigException exc)
     {
-        assert(exc.toString() == "/dev/null(0:5): map: Expected to be of type mapping (object), but is a scalar");
+        assert(exc.toString() == "/dev/null(0:5): map: Expected to be a mapping (object), but is a scalar");
     }
 
     try
@@ -184,7 +184,7 @@ unittest
     }
     catch (ConfigException exc)
     {
-        assert(exc.toString() == "/dev/null(1:2): map: Expected to be of type mapping (object), but is a sequence");
+        assert(exc.toString() == "/dev/null(1:2): map: Expected to be a mapping (object), but is a sequence");
     }
 
     try
@@ -194,7 +194,7 @@ unittest
     }
     catch (ConfigException exc)
     {
-        assert(exc.toString() == "/dev/null(1:2): scalar: Expected to be of type scalar (value), but is a sequence");
+        assert(exc.toString() == "/dev/null(1:2): scalar: Expected to be a value of type int, but is a sequence");
     }
 
     try
@@ -204,7 +204,7 @@ unittest
     }
     catch (ConfigException exc)
     {
-        assert(exc.toString() == "/dev/null(1:2): scalar: Expected to be of type scalar (value), but is a mapping");
+        assert(exc.toString() == "/dev/null(1:2): scalar: Expected to be a value of type int, but is a mapping");
     }
 }
 

@@ -242,7 +242,7 @@ package final class TypeConfigException : ConfigException
     {
         const useColors = spec.spec == 'S';
 
-        const fmt = "Expected to be of type %s, but is a %s";
+        const fmt = "Expected to be %s, but is a %s";
 
         if (useColors)
             formattedWrite(sink, fmt, this.expected.paint(Green), this.actual.paint(Red));
