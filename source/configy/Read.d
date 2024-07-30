@@ -442,7 +442,7 @@ public T parseConfig (T) (
     case NodeID.sequence:
     case NodeID.scalar:
     case NodeID.invalid:
-        throw new TypeConfigException(node, "mapping (object)", "document root");
+        throw new TypeConfigException(node, "a mapping (object)", "document root");
     }
 }
 
@@ -733,7 +733,7 @@ package FR.Type parseField (alias FR)
     else static if (is(FR.Type == struct))
     {
         if (node.nodeID != NodeID.mapping)
-            throw new TypeConfigException(node, "mapping (object)", path);
+            throw new TypeConfigException(node, "a mapping (object)", path);
         return node.parseMapping!(FR)(path, defaultValue, ctx, null);
     }
 
@@ -750,7 +750,7 @@ package FR.Type parseField (alias FR)
     else static if (is(FR.Type : E[K], E, K))
     {
         if (node.nodeID != NodeID.mapping)
-            throw new TypeConfigException(node, "mapping (associative array)", path);
+            throw new TypeConfigException(node, "a mapping (associative array)", path);
 
         // Note: As of June 2022 (DMD v2.100.0), associative arrays cannot
         // have initializers, hence their UX for config is less optimal.
@@ -833,7 +833,7 @@ package FR.Type parseField (alias FR)
 private T parseScalar (T) (Node node, string path)
 {
     if (node.nodeID != NodeID.scalar)
-        throw new TypeConfigException(node, "scalar (value)", path);
+        throw new TypeConfigException(node, "a value of type " ~ T.stringof, path);
 
     static if (is(T == enum))
         return node.as!string.to!(T);
