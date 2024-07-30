@@ -532,7 +532,7 @@ private TLFR.Type parseMapping (alias TLFR)
         }
     }
 
-    const enabledState = node.isMappingEnabled!(TLFR.Type)(defaultValue);
+    const enabledState = node.isMappingEnabled!(TLFR.Type)(path, defaultValue);
 
     if (enabledState.field != EnabledState.Field.None)
         dbgWrite("%s: Mapping is enabled: %s", TLFR.Type.stringof.paint(Cyan), (!!enabledState).paintBool());
@@ -993,7 +993,7 @@ private template NameIs (string searching)
 
 /// Returns whether or not the field has a `enabled` / `disabled` field,
 /// and its value. If it does not, returns `true`.
-private EnabledState isMappingEnabled (M) (Node node, auto ref M default_)
+private EnabledState isMappingEnabled (M) (Node node, string path, auto ref M default_)
 {
     import std.meta : Filter;
 
@@ -1007,13 +1007,13 @@ private EnabledState isMappingEnabled (M) (Node node, auto ref M default_)
                        "` conflicts with `disabled` field `" ~ DMT[0].FieldName ~ "`");
 
         if (auto ptr = "enabled" in node)
-            return EnabledState(EnabledState.Field.Enabled, (*ptr).as!bool);
+            return EnabledState(EnabledState.Field.Enabled, (*ptr).parseScalar!(bool)(path, "enabled"));
         return EnabledState(EnabledState.Field.Enabled, __traits(getMember, default_, EMT[0].FieldName));
     }
     else static if (DMT.length)
     {
         if (auto ptr = "disabled" in node)
-            return EnabledState(EnabledState.Field.Disabled, (*ptr).as!bool);
+            return EnabledState(EnabledState.Field.Disabled, (*ptr).parseScalar!(bool)(path, "disabled"));
         return EnabledState(EnabledState.Field.Disabled, __traits(getMember, default_, DMT[0].FieldName));
     }
     else
