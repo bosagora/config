@@ -928,3 +928,40 @@ dynamic:
     assert(c1.static_[1].value == 70);
     assert(c1.static_[2].value == 71);
 }
+
+/// Test around enabled / disabled not being boolean values
+unittest
+{
+    static struct SectionE {
+        bool enabled;
+        int value;
+        string val2;
+    }
+
+    static struct SectionD {
+        bool disabled = false;
+        int value;
+        string val2;
+    }
+
+    static struct Config {
+        SectionE es;
+        SectionD ds;
+    }
+
+    try parseConfigString!Config(`es:
+  enabled: false
+ds:
+  disabled: MAYBE
+`, "/dev/null");
+    catch (ConfigException exc)
+        assert(exc.toString() == "/dev/null(3:12): ds.disabled: Expected to be a value of type bool, but is a scalar");
+
+    try parseConfigString!Config(`es:
+  enabled: PERHAPS
+ds:
+  disabled: true
+`, "/dev/null");
+    catch (ConfigException exc)
+        assert(exc.toString() == "/dev/null(1:11): es.enabled: Expected to be a value of type bool, but is a scalar");
+}
