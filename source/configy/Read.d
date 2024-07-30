@@ -830,15 +830,19 @@ package FR.Type parseField (alias FR)
 }
 
 /// Parse a node as a scalar
-private T parseScalar (T) (Node node, string path)
+private T parseScalar (T) (Node node, string path, string key = null)
 {
     if (node.nodeID != NodeID.scalar)
-        throw new TypeConfigException(node, "a value of type " ~ T.stringof, path);
+        throw new TypeConfigException(node, "a value of type " ~ T.stringof, path, key);
 
-    static if (is(T == enum))
-        return node.as!string.to!(T);
-    else
-        return node.as!(T);
+    try {
+        static if (is(T == enum))
+            return node.as!string.to!(T);
+        else
+            return node.as!(T);
+    } catch (Exception exc) {
+        throw new TypeConfigException(node, "a value of type " ~ T.stringof, path, key);
+    }
 }
 
 /*******************************************************************************
