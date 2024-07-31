@@ -46,19 +46,19 @@ import std.string : soundexer;
 public abstract class ConfigException : Exception
 {
     /// Position at which the error happened
-    public Mark yamlPosition;
+    public Location loc;
 
     /// The path in the configuration structure at which the error resides
     public string path;
 
     /// Constructor
-    public this (string path, Mark position,
+    public this (string path, Location position,
                  string file = __FILE__, size_t line = __LINE__)
         @safe pure nothrow @nogc
     {
         super(null, file, line);
         this.path = path;
-        this.yamlPosition = position;
+        this.loc = position;
     }
 
     /***************************************************************************
@@ -109,16 +109,16 @@ public abstract class ConfigException : Exception
         char[20] buffer = void;
 
         if (useColors) sink(Yellow);
-        sink(this.yamlPosition.name);
+        sink(this.loc.file);
         if (useColors) sink(Reset);
 
         sink("(");
         if (useColors) sink(Cyan);
-        sink(unsignedToTempString(this.yamlPosition.line, buffer));
+        sink(unsignedToTempString(this.loc.line, buffer));
         if (useColors) sink(Reset);
         sink(":");
         if (useColors) sink(Cyan);
-        sink(unsignedToTempString(this.yamlPosition.column, buffer));
+        sink(unsignedToTempString(this.loc.column, buffer));
         if (useColors) sink(Reset);
         sink("): ");
 
@@ -168,14 +168,14 @@ public abstract class ConfigException : Exception
 /// A configuration exception that is only a single message
 package final class ConfigExceptionImpl : ConfigException
 {
-    public this (string msg, Mark position,
+    public this (string msg, Location position,
                  string file = __FILE__, size_t line = __LINE__)
         @safe pure nothrow @nogc
     {
         this(msg, null, position, file, line);
     }
 
-    public this (string msg, string path, Mark position,
+    public this (string msg, string path, Location position,
                  string file = __FILE__, size_t line = __LINE__)
         @safe pure nothrow @nogc
     {
@@ -205,13 +205,13 @@ package final class TypeConfigException : ConfigException
                  string file = __FILE__, size_t line = __LINE__)
         @safe nothrow
     {
-        this(node.nodeTypeString(), expected, path, node.startMark(),
+        this(node.nodeTypeString(), expected, path, Location.get(node),
              file, line);
     }
 
     /// Ditto
-    public this (string actual, string expected, string path, Mark position,
-        string file = __FILE__, size_t line = __LINE__)
+    public this (string actual, string expected, string path,
+        Location position, string file = __FILE__, size_t line = __LINE__)
         @safe pure nothrow @nogc
     {
         super(path, position, file, line);
@@ -251,7 +251,7 @@ package final class DurationTypeConfigException : ConfigException
     public this (Node node, string path, string file = __FILE__, size_t line = __LINE__)
         @safe nothrow
     {
-        super(path, node.startMark(), file, line);
+        super(path, Location.get(node), file, line);
         this.actual = node.nodeTypeString();
     }
 
@@ -282,7 +282,7 @@ public class UnknownKeyConfigException : ConfigException
 
     /// Constructor
     public this (string path, string key, immutable string[] fieldNames,
-                 Mark position, string file = __FILE__, size_t line = __LINE__)
+                 Location position, string file = __FILE__, size_t line = __LINE__)
         @safe pure nothrow
     {
         super(path.addPath(key), position, file, line);
@@ -329,7 +329,7 @@ public class UnknownKeyConfigException : ConfigException
 public class MissingKeyException : ConfigException
 {
     /// Constructor
-    public this (string path, Mark position,
+    public this (string path, Location position,
                  string file = __FILE__, size_t line = __LINE__)
         @safe pure nothrow @nogc
     {
@@ -349,7 +349,7 @@ public class MissingKeyException : ConfigException
 public class ConstructionException : ConfigException
 {
     /// Constructor
-    public this (Exception next, string path, Mark position,
+    public this (Exception next, string path, Location position,
                  string file = __FILE__, size_t line = __LINE__)
         @safe pure nothrow @nogc
     {
@@ -377,7 +377,7 @@ public class ArrayLengthException : ConfigException
 
     /// Constructor
     public this (size_t actual, size_t expected,
-                 string path, Mark position,
+                 string path, Location position,
                  string file = __FILE__, size_t line = __LINE__)
         @safe pure nothrow @nogc
     {
@@ -401,5 +401,21 @@ public class ArrayLengthException : ConfigException
         sink(unsignedToTempString(this.expected, buffer));
         sink(", got ");
         sink(unsignedToTempString(this.actual, buffer));
+    }
+}
+
+// Helper struct to abstract away the YAML type
+package struct Location {
+    /// File from which this `Node` originates, or `null`
+    public string file;
+    /// Line in `file` at which this `Node` is located, or `0`
+    public size_t line;
+    /// Column in `line` of `file` at which this `Node` originates, or `0`
+    public size_t column;
+
+    /// Helper function
+    package static Location get (Node n) @safe pure nothrow @nogc {
+        auto m = n.startMark();
+        return Location(m.name, m.line, m.column);
     }
 }

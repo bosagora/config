@@ -522,12 +522,12 @@ private TLFR.Type parseMapping (alias TLFR)
                 if (ctx.strict == StrictMode.Warn)
                 {
                     scope exc = new UnknownKeyConfigException(
-                        path, key.as!string, fieldNames, key.startMark());
+                        path, key.as!string, fieldNames, Location.get(key));
                     exc.printException();
                 }
                 else
                     throw new UnknownKeyConfigException(
-                        path, key.as!string, fieldNames, key.startMark());
+                        path, key.as!string, fieldNames, Location.get(key));
             }
         }
     }
@@ -571,7 +571,7 @@ private TLFR.Type parseMapping (alias TLFR)
 
             if (ctx.strict && FR.FieldName in node)
                 throw new ConfigExceptionImpl("'Key' field is specified twice",
-                    path.addPath(FR.FieldName), node.startMark());
+                    path.addPath(FR.FieldName), Location.get(node));
             return (*ptr).parseField!(FR)(path.addPath(FR.FieldName), default_, ctx)
                 .dbgWriteRet("Using value '%s' from fieldDefaults for field '%s'",
                              FR.FieldName.paint(Cyan));
@@ -613,7 +613,7 @@ private TLFR.Type parseMapping (alias TLFR)
             return Node(aa).parseMapping!(FR)(npath, default_, ctx, null);
         }
         else
-            throw new MissingKeyException(path.addPath(FR.Name), node.startMark());
+            throw new MissingKeyException(path.addPath(FR.Name), Location.get(node));
     }
 
     FR.Type convert (alias FR) ()
@@ -709,19 +709,19 @@ package FR.Type parseField (alias FR)
             true);
 
     else static if (hasConverter!(FR.Ref))
-        return wrapConstruct(node.viaConverter!(FR), path, node.startMark());
+        return wrapConstruct(node.viaConverter!(FR), path, Location.get(node));
 
     else static if (hasFromYAML!(FR.Type))
     {
         scope impl = new ConfigParserImpl!(FR.Type)(node, path, ctx);
-        return wrapConstruct(FR.Type.fromYAML(impl), path, node.startMark());
+        return wrapConstruct(FR.Type.fromYAML(impl), path, Location.get(node));
     }
 
     else static if (hasFromString!(FR.Type))
-        return wrapConstruct(FR.Type.fromString(node.as!string), path, node.startMark());
+        return wrapConstruct(FR.Type.fromString(node.as!string), path, Location.get(node));
 
     else static if (hasStringCtor!(FR.Type))
-        return wrapConstruct(FR.Type(node.as!string), path, node.startMark());
+        return wrapConstruct(FR.Type(node.as!string), path, Location.get(node));
 
     else static if (is(immutable(FR.Type) == immutable(core.time.Duration)))
     {
@@ -786,7 +786,7 @@ package FR.Type parseField (alias FR)
                         throw new TypeConfigException(
                             "sequence of " ~ pair.value.nodeTypeString(),
                             "sequence of mapping (array of objects)",
-                            path, node.startMark());
+                            path, Location.get(node));
 
                     return pair.value.parseMapping!(StructFieldRef!E)(
                         path.addPath(pair.key.as!string),
@@ -804,7 +804,7 @@ package FR.Type parseField (alias FR)
                 {
                     if (res.length != k)
                         throw new ArrayLengthException(
-                            res.length, k, path, node.startMark());
+                            res.length, k, path, Location.get(node));
                     return res[0 .. k];
                 }
                 else
@@ -867,7 +867,7 @@ private T parseScalar (T) (Node node, lazy string path)
 
 *******************************************************************************/
 
-private T wrapConstruct (T) (lazy T exp, string path, Mark position,
+private T wrapConstruct (T) (lazy T exp, string path, Location position,
     string file = __FILE__, size_t line = __LINE__)
 {
     try
