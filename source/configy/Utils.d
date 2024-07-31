@@ -22,6 +22,13 @@ import std.format;
 /// Type of sink used by the `toString`
 package alias SinkType = void delegate (in char[]) @safe;
 
+/// Convenience function to extend a path
+package string addPath (string opath, string newPart) @safe pure nothrow
+in(newPart.length)
+do {
+    return opath.length ? (opath ~ "." ~ newPart) : newPart;
+}
+
 /*******************************************************************************
 
     Debugging utility for config filler

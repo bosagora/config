@@ -570,7 +570,8 @@ private TLFR.Type parseMapping (alias TLFR)
                      FR.Name.paint(Cyan), path.paint(Cyan), FR.FieldName.paint(Cyan));
 
             if (ctx.strict && FR.FieldName in node)
-                throw new ConfigExceptionImpl("'Key' field is specified twice", path, FR.FieldName, node.startMark());
+                throw new ConfigExceptionImpl("'Key' field is specified twice",
+                    path.addPath(FR.FieldName), node.startMark());
             return (*ptr).parseField!(FR)(path.addPath(FR.FieldName), default_, ctx)
                 .dbgWriteRet("Using value '%s' from fieldDefaults for field '%s'",
                              FR.FieldName.paint(Cyan));
@@ -612,7 +613,7 @@ private TLFR.Type parseMapping (alias TLFR)
             return Node(aa).parseMapping!(FR)(npath, default_, ctx, null);
         }
         else
-            throw new MissingKeyException(path, FR.Name, node.startMark());
+            throw new MissingKeyException(path.addPath(FR.Name), node.startMark());
     }
 
     FR.Type convert (alias FR) ()
@@ -785,7 +786,7 @@ package FR.Type parseField (alias FR)
                         throw new TypeConfigException(
                             "sequence of " ~ pair.value.nodeTypeString(),
                             "sequence of mapping (array of objects)",
-                            path, null, node.startMark());
+                            path, node.startMark());
 
                     return pair.value.parseMapping!(StructFieldRef!E)(
                         path.addPath(pair.key.as!string),
@@ -803,7 +804,7 @@ package FR.Type parseField (alias FR)
                 {
                     if (res.length != k)
                         throw new ArrayLengthException(
-                            res.length, k, path, null, node.startMark());
+                            res.length, k, path, node.startMark());
                     return res[0 .. k];
                 }
                 else
@@ -830,10 +831,10 @@ package FR.Type parseField (alias FR)
 }
 
 /// Parse a node as a scalar
-private T parseScalar (T) (Node node, string path, string key = null)
+private T parseScalar (T) (Node node, lazy string path)
 {
     if (node.nodeID != NodeID.scalar)
-        throw new TypeConfigException(node, "a value of type " ~ T.stringof, path, key);
+        throw new TypeConfigException(node, "a value of type " ~ T.stringof, path);
 
     try {
         static if (is(T == enum))
@@ -841,7 +842,7 @@ private T parseScalar (T) (Node node, string path, string key = null)
         else
             return node.as!(T);
     } catch (Exception exc) {
-        throw new TypeConfigException(node, "a value of type " ~ T.stringof, path, key);
+        throw new TypeConfigException(node, "a value of type " ~ T.stringof, path);
     }
 }
 
@@ -1007,13 +1008,13 @@ private EnabledState isMappingEnabled (M) (Node node, string path, auto ref M de
                        "` conflicts with `disabled` field `" ~ DMT[0].FieldName ~ "`");
 
         if (auto ptr = "enabled" in node)
-            return EnabledState(EnabledState.Field.Enabled, (*ptr).parseScalar!(bool)(path, "enabled"));
+            return EnabledState(EnabledState.Field.Enabled, (*ptr).parseScalar!(bool)(path.addPath("enabled")));
         return EnabledState(EnabledState.Field.Enabled, __traits(getMember, default_, EMT[0].FieldName));
     }
     else static if (DMT.length)
     {
         if (auto ptr = "disabled" in node)
-            return EnabledState(EnabledState.Field.Disabled, (*ptr).parseScalar!(bool)(path, "disabled"));
+            return EnabledState(EnabledState.Field.Disabled, (*ptr).parseScalar!(bool)(path.addPath("disabled")));
         return EnabledState(EnabledState.Field.Disabled, __traits(getMember, default_, DMT[0].FieldName));
     }
     else
@@ -1089,11 +1090,4 @@ unittest
 
     static assert(!hasFieldWiseCtor!(StructFieldRef!PubKey));
     static assert( hasStringCtor!PubKey);
-}
-
-/// Convenience function to extend a YAML path
-private string addPath (string opath, string newPart) @safe pure
-in(newPart.length)
-do {
-    return opath.length ? format("%s.%s", opath, newPart) : newPart;
 }
