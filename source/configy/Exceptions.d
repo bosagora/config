@@ -48,30 +48,17 @@ public abstract class ConfigException : Exception
     /// Position at which the error happened
     public Mark yamlPosition;
 
-    /// The path at which the key resides
+    /// The path in the configuration structure at which the error resides
     public string path;
 
-    /// If non-empty, the key under 'path' which triggered the error
-    /// If empty, the key should be considered part of 'path'
-    public string key;
-
     /// Constructor
-    public this (string path, string key, Mark position,
+    public this (string path, Mark position,
                  string file = __FILE__, size_t line = __LINE__)
         @safe pure nothrow @nogc
     {
         super(null, file, line);
         this.path = path;
-        this.key = key;
         this.yamlPosition = position;
-    }
-
-    /// Ditto
-    public this (string path, Mark position,
-                 string file = __FILE__, size_t line = __LINE__)
-        @safe pure nothrow @nogc
-    {
-        this(path, null, position, file, line);
     }
 
     /***************************************************************************
@@ -135,13 +122,10 @@ public abstract class ConfigException : Exception
         if (useColors) sink(Reset);
         sink("): ");
 
-        if (this.path.length || this.key.length)
+        if (this.path.length)
         {
             if (useColors) sink(Yellow);
             sink(this.path);
-            if (this.path.length && this.key.length)
-                sink(".");
-            sink(this.key);
             if (useColors) sink(Reset);
             sink(": ");
         }
@@ -188,14 +172,14 @@ package final class ConfigExceptionImpl : ConfigException
                  string file = __FILE__, size_t line = __LINE__)
         @safe pure nothrow @nogc
     {
-        this(msg, null, null, position, file, line);
+        this(msg, null, position, file, line);
     }
 
-    public this (string msg, string path, string key, Mark position,
+    public this (string msg, string path, Mark position,
                  string file = __FILE__, size_t line = __LINE__)
         @safe pure nothrow @nogc
     {
-        super(path, key, position, file, line);
+        super(path, position, file, line);
         this.msg = msg;
     }
 
@@ -217,20 +201,20 @@ package final class TypeConfigException : ConfigException
     public string expected;
 
     /// Constructor
-    public this (Node node, string expected, string path, string key = null,
+    public this (Node node, string expected, string path,
                  string file = __FILE__, size_t line = __LINE__)
         @safe nothrow
     {
-        this(node.nodeTypeString(), expected, path, key, node.startMark(),
+        this(node.nodeTypeString(), expected, path, node.startMark(),
              file, line);
     }
 
     /// Ditto
-    public this (string actual, string expected, string path, string key,
-                 Mark position, string file = __FILE__, size_t line = __LINE__)
+    public this (string actual, string expected, string path, Mark position,
+        string file = __FILE__, size_t line = __LINE__)
         @safe pure nothrow @nogc
     {
-        super(path, key, position, file, line);
+        super(path, position, file, line);
         this.actual = actual;
         this.expected = expected;
     }
@@ -267,7 +251,7 @@ package final class DurationTypeConfigException : ConfigException
     public this (Node node, string path, string file = __FILE__, size_t line = __LINE__)
         @safe nothrow
     {
-        super(path, null, node.startMark(), file, line);
+        super(path, node.startMark(), file, line);
         this.actual = node.nodeTypeString();
     }
 
@@ -293,12 +277,16 @@ public class UnknownKeyConfigException : ConfigException
     /// The list of valid field names
     public immutable string[] fieldNames;
 
+    /// The erroring key
+    public string key;
+
     /// Constructor
     public this (string path, string key, immutable string[] fieldNames,
                  Mark position, string file = __FILE__, size_t line = __LINE__)
-        @safe pure nothrow @nogc
+        @safe pure nothrow
     {
-        super(path, key, position, file, line);
+        super(path.addPath(key), position, file, line);
+        this.key = key;
         this.fieldNames = fieldNames;
     }
 
@@ -341,11 +329,11 @@ public class UnknownKeyConfigException : ConfigException
 public class MissingKeyException : ConfigException
 {
     /// Constructor
-    public this (string path, string key, Mark position,
+    public this (string path, Mark position,
                  string file = __FILE__, size_t line = __LINE__)
         @safe pure nothrow @nogc
     {
-        super(path, key, position, file, line);
+        super(path, position, file, line);
     }
 
     /// Format the message with or without colors
@@ -389,14 +377,14 @@ public class ArrayLengthException : ConfigException
 
     /// Constructor
     public this (size_t actual, size_t expected,
-                 string path, string key, Mark position,
+                 string path, Mark position,
                  string file = __FILE__, size_t line = __LINE__)
         @safe pure nothrow @nogc
     {
         assert(actual != expected);
         this.actual = actual;
         this.expected = expected;
-        super(path, key, position, file, line);
+        super(path, position, file, line);
     }
 
     /// Format the message with or without colors
