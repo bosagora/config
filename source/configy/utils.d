@@ -15,7 +15,7 @@
 
 *******************************************************************************/
 
-module configy.Utils;
+module configy.utils;
 
 import std.format;
 

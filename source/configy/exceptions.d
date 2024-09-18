@@ -11,9 +11,9 @@
 
 *******************************************************************************/
 
-module configy.Exceptions;
+module configy.exceptions;
 
-import configy.Utils;
+import configy.utils;
 
 import dyaml.exception;
 import dyaml.node;
