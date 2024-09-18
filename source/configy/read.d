@@ -141,13 +141,13 @@
 
 *******************************************************************************/
 
-module configy.Read;
+module configy.read;
 
-public import configy.Attributes;
-public import configy.Exceptions : ConfigException;
-import configy.Exceptions;
-import configy.FieldRef;
-import configy.Utils;
+public import configy.attributes;
+public import configy.exceptions : ConfigException;
+import configy.exceptions;
+import configy.fieldref;
+import configy.utils;
 
 import dyaml.exception;
 import dyaml.node;

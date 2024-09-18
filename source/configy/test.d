@@ -11,12 +11,12 @@
 
 *******************************************************************************/
 
-module configy.Test;
+module configy.test;
 
-import configy.Attributes;
-import configy.Exceptions;
-import configy.Read;
-import configy.Utils;
+import configy.attributes;
+import configy.exceptions;
+import configy.read;
+import configy.utils;
 
 import dyaml.node;
 

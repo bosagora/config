@@ -14,7 +14,7 @@
 
 *******************************************************************************/
 
-module configy.Attributes;
+module configy.attributes;
 
 import std.traits;
 
@@ -298,8 +298,8 @@ public auto converter (FT) (FT func)
 public interface ConfigParser (T)
 {
     import dyaml.node;
-    import configy.FieldRef : StructFieldRef;
-    import configy.Read : Context, parseField;
+    import configy.fieldref : StructFieldRef;
+    import configy.read : Context, parseField;
 
     /// Returns: the node being processed
     public inout(Node) node () inout @safe pure nothrow @nogc;

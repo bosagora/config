@@ -15,10 +15,10 @@
 
 *******************************************************************************/
 
-module configy.FieldRef;
+module configy.fieldref;
 
 // Renamed imports as the names exposed by `FieldRef` shadow the imported ones.
-import configy.Attributes : CAName = Name, CAOptional = Optional, SetInfo;
+import configy.attributes : CAName = Name, CAOptional = Optional, SetInfo;
 
 import std.meta;
 import std.traits;
@@ -86,7 +86,7 @@ package template FieldRef (alias T, string name, bool forceOptional = false)
 
 unittest
 {
-    import configy.Attributes : Name;
+    import configy.attributes : Name;
 
     static struct Config1
     {

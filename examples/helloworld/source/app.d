@@ -1,6 +1,6 @@
 module helloworld;
 
-import configy.Read;
+import configy.read;
 
 import std.getopt;
 import std.stdio;
