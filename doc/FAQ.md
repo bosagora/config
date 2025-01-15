@@ -22,7 +22,7 @@ This is the default as it prevent any unnoticed misconfiguration that would resu
 a typo to an optional field name.
 To disable `strict` parsing, simply pass `StrictMode.Ignore` as the optional parameter
 to either `parseConfigFile`, `parseConfigString`, or `parseConfigFileSimple` method.
-To notify the user whithout triggering an error, use `StrictMode.Warn` instead.
+To notify the user without triggering an error, use `StrictMode.Warn` instead.
 
 ### Make a field required
 
@@ -51,7 +51,7 @@ struct Config
 }
 ```
 
-Finally, as a byproduct of its functionality, using `SetInfo` implicitly make a field optional.
+Finally, as a byproduct of its functionality, using `SetInfo` implicitly makes a field optional.
 
 ### Known when a field is set
 
@@ -194,7 +194,7 @@ or 87030 seconds.
 
 ### Implement complex types that are not composite types of simple types
 
-The library recognizes three possible ways were a field of type `T`,
+The library recognizes three possible ways where a field of type `T`,
 where `T` is a `struct`, can be constructed:
 - The `T` has a `static` `fromString` method which accepts a single argument
   that is a string-like type (e.g. `scope const char[]` or just `string`),
@@ -279,6 +279,6 @@ this bug will need to be fixed in D-YAML.
 
 If validation of individual fields is not enough and the section as a whole needs
 to be validated, one can implement a `void validate() const` method which throws
-an exception in the even of a validation failure.
+an exception in the event of a validation failure.
 The library will rethrow this `Exception` with the file/line information pointing
 to the section itself, and not any individual field.
