@@ -839,6 +839,36 @@ unittest
     assert(v2.v2.str == "hello world");
 }
 
+/// Test calling fromString on scalars only
+unittest
+{
+    static struct Job {
+        static struct Image {
+            string name;
+            static Image fromString(string s) {
+                Image v;
+                v.name = s;
+                return v;
+            }
+        }
+        Image image;
+    }
+    // alias Config = Job[string]; // TODO, we should support top-level associative arrays
+    struct Config { Job job; }
+
+    auto c1 = parseConfigString!Config(`
+job:
+  image: ruby:3.0
+`, "/dev/null");
+    auto c2 = parseConfigString!Config(`
+job:
+  image:
+    name: ruby:3.0
+`, "/dev/null");
+    assert(c1.job.image.name == "ruby:3.0");
+    assert(c2.job.image.name == "ruby:3.0");
+}
+
 /// Don't call `opCmp` / `opEquals` as they might not be CTFEable
 /// Also various tests around static arrays
 unittest
