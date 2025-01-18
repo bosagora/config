@@ -653,7 +653,7 @@ private TLFR.Type parseMapping (alias TLFR)
             {
                 dbgWrite("%s: Calling `%s` method",
                      TLFR.Type.stringof.paint(Cyan), "validate()".paint(Green));
-                result.validate();
+                wrapConstruct(result.validate(), path, Location.get(node));
             }
             else
             {

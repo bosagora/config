@@ -332,11 +332,22 @@ unittest
         public int value;
     }
 
+    static struct ThrowingValidate
+    {
+        void validate() const
+        {
+            throw new Exception("Bad data, try again");
+        }
+
+        public int value;
+    }
+
     static struct InnerConfig
     {
         public int value;
         @Optional ThrowingCtor ctor;
         @Optional ThrowingFromString fromString;
+        @Optional ThrowingValidate validated;
 
         @Converter!int(
             (Node value) {
@@ -372,6 +383,16 @@ unittest
     catch (ConfigException exc)
     {
         assert(exc.toString() == "/dev/null(2:14): config.fromString: Some meaningful error message");
+    }
+
+    try
+    {
+        auto result = parseConfigString!Config("config:\n  value: 42\n  validated:\n    value: 42", "/dev/null");
+        assert(0);
+    }
+    catch (ConfigException exc)
+    {
+        assert(exc.toString() == "/dev/null(3:4): config.validated: Bad data, try again");
     }
 
     try
