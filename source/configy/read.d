@@ -721,8 +721,7 @@ package FR.Type parseField (alias FR)
     {
         if (node.nodeID == NodeID.mapping)
             return node.parseMapping!(FR)(path, defaultValue, ctx, null);
-        else
-        if (node.nodeID == NodeID.scalar)
+        else if (node.nodeID == NodeID.scalar)
             return wrapConstruct(FR.Type.fromString(node.as!string), path, Location.get(node));
         else
             throw new TypeConfigException(node, "a mapping (object) or a scalar", path);
