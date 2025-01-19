@@ -971,7 +971,7 @@ unittest
 {
     static struct N {
         @Optional int value;
-        @Optional N* left, right;
+        @Optional const N* left, right;
     }
     auto c = parseConfigString!N(`left:
   left:

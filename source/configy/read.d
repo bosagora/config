@@ -825,10 +825,7 @@ package FR.Type parseField (alias FR)
     else static if (is(FR.Type == T*, T))
     {
         // Allocate and parse pointers' values.
-        auto value = new T;
-        *value = node.parseField!(NestedFieldRef!(T, FR))(
-            path, T.init, ctx);
-        return value;
+        return [node.parseField!(NestedFieldRef!(T, FR))(path, T.init, ctx)].ptr;
     }
     else
     {
