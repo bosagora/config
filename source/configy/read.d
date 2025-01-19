@@ -822,6 +822,11 @@ package FR.Type parseField (alias FR)
             );
         }
     }
+    else static if (is(FR.Type == T*, T))
+    {
+        // Allocate and parse pointers' values.
+        return [node.parseField!(NestedFieldRef!(T, FR))(path, T.init, ctx)].ptr;
+    }
     else
     {
         static assert (!is(FR.Type == union),
